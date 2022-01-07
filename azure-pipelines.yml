@@ -1,37 +1,46 @@
-trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
-
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '14.x'
-  displayName: 'Install Node.js'
-
-- script: |
-    npm install -g @angular/cli
-    npm install
-    ng build --prod
-  displayName: 'npm install and build'
-
-- task: AzureCLI@2
-  displayName: 'Clear Static website'
-  inputs:
-    azureSubscription: 'My Subscription'
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: 'az storage blob delete-batch --account-name mystorageaccount --source "\$web"'
-- task: AzureCLI@2
-  displayName: 'Upload new Static Website'
-  inputs:
-    azureSubscription: 'My Subscription'
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: 'az storage blob upload-batch --account-name mystorageaccount --destination "\$web" --source ''$(Build.Repository.LocalPath)/dist/myappname'''
-
-- task: AzureWebAppContainer@1
-  inputs:
-    azureSubscription: 'Azure subscription 1 (556038d8-ed3a-4ed8-92c6-320b9c15d8b5)'
-    appName: 'app_angular'
+# Node.js  
+# Build a general Node.js project with npm.  
+# Add steps that analyze code, save build artifacts, deploy, and more:  
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript  
+  
+trigger:  
+- master  
+  
+pool:  
+  vmImage: 'ubuntu-latest'  
+  
+steps:  
+- task: NodeTool@0  
+  inputs:  
+    versionSpec: '12.x'  
+  displayName: 'Install Node.js 12.x'  
+- task: Npm@1  
+  displayName: 'Angular CLI'  
+  inputs:  
+    command: custom  
+    verbose: false  
+    customCommand: 'install @angular/cli@7.3.1'  
+- task: Npm@1  
+  displayName: 'npm install'  
+  inputs:  
+    verbose: false  
+  
+- task: Npm@1  
+  displayName: Build  
+  inputs:  
+    command: custom  
+    verbose: false  
+    customCommand: 'run build'  
+  
+- task: CopyPublishBuildArtifacts@1  
+  displayName: 'Copy Publish Artifact: test'  
+  inputs:  
+    CopyRoot: dist  
+    Contents: '**'  
+    ArtifactName: test  
+    ArtifactType: Container  
+  
+- task: DownloadPipelineArtifact@2  
+  displayName: 'Download Pipeline Artifact'  
+  inputs:  
+    targetPath: ' $(Build.ArtifactStagingDirectory)/dist/AngularTest'  
