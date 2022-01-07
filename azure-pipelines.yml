@@ -30,5 +30,5 @@ steps:
   inputs:  
     command: custom  
     verbose: false  
-    customCommand: 'ng build'  
+    customCommand: 'run build'  
   
