@@ -1,8 +1,4 @@
 trigger:
-- task: AzureWebAppContainer@1
-  inputs:
-    azureSubscription: 'Azure subscription 1 (556038d8-ed3a-4ed8-92c6-320b9c15d8b5)'
-    appName: 'angular_app_pipeline'
 - main
 
 pool:
@@ -34,3 +30,8 @@ steps:
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: 'az storage blob upload-batch --account-name mystorageaccount --destination "\$web" --source ''$(Build.Repository.LocalPath)/dist/myappname'''
+
+- task: AzureWebAppContainer@1
+  inputs:
+    azureSubscription: 'Azure subscription 1 (556038d8-ed3a-4ed8-92c6-320b9c15d8b5)'
+    appName: 'app_angular'
